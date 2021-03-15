@@ -18,7 +18,7 @@ account_info=mt5.account_info()
 if account_info!=None:
 #store the balance and equity of your account
     equity=float(account_info[10])
-
+#dates will be used to define the range of our dataset in the get_data function
 def get_dates():
     global utc_to, utc_from, from_date, to_date
     days_before = timedelta(days=1)
@@ -27,7 +27,7 @@ def get_dates():
     end_of_day = datetime_time(23,59,59)
     utc_to = datetime.now()
     utc_from = datetime.combine(todays_date, start_of_day) - days_before
-
+#pull one day of 10 minute candles along with the buy and sell prices for bitcoin
 def get_data():
     global candles, current_buy_price, current_sell_price
     #utc_from and utc_to in order to define the time period while mt5.TIMEFRAME_M10 defines the timeframes.
@@ -37,7 +37,7 @@ def get_data():
      #bid and ask price can also be defined as:
     price_buy=mt5.symbol_info_tick("BTCUSD").bid
     price_sell=mt5.symbol_info_tick("BTCUSD").ask
-
+#build the logic and send the trade request to the MT5 terminal
 def trade():
     global candles
     crypto = "BTCUSD"
@@ -117,20 +117,7 @@ def trade():
             print("Buying signal detected but there is already an active trade")
         else:
             print("difference is only:", "%" + str(difference), "trying again...")
-
-def go_trade():
-    i = 1
-    while i != 0:
-        get_dates()
-        get_data()
-        trade()
-        i= i+1
-        print (i)
-        time.sleep(5)
-thread = threading.Thread(target=go_trade)
-thread.start()
-thread.join()
-
+#add threading so the bot will always listen for chanchges in price. You can adjust the speed in the time.sleep.
 def go_trade():
     i = 1
     while i != 0:
