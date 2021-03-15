@@ -12,7 +12,6 @@ if authorized:
     print("connected to account #{}".format(account))
 else:
     print("failed to connect at account #{}, error code: {}".format(account, mt5.last_error()))
-
 #log into MT5 terminal
 account_info=mt5.account_info()
 if account_info!=None:
