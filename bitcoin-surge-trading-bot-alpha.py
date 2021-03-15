@@ -16,7 +16,7 @@ else:
 #log into MT5 terminal
 account_info=mt5.account_info()
 if account_info!=None:
-#store the balance and equity of your account
+#store the equity of your account
     equity=float(account_info[10])
 #dates will be used to define the range of our dataset in the get_data function
 def get_dates():
@@ -44,12 +44,12 @@ def trade():
     #calculate the % difference between the current price and the close price of the previous candle
     difference = (candles["close"][-1] - candles["close"][-2])/candles["close"][-2]*100
     symbol = crypto
-    #used to check id a position has already been placed
+    #used to check if a position has already been placed
     positions = mt5.positions_get(symbol=symbol)
     orders=mt5.orders_get(symbol=symbol)
     symbol_info = mt5.symbol_info(symbol)
     point = mt5.symbol_info(symbol).point
-
+    #perform logic check
     if difference >3:
         print("dif 1:", crypto, difference)
         #Pause for 8 seconds to ensure the increase is sustained
@@ -61,7 +61,7 @@ def trade():
             print("dif 2:", crypto, difference)
             price=mt5.symbol_info_tick(symbol).bid
             print(crypto, "is up", "%" + str(difference), "in the last 5 minutes opening BUY position...")
-
+            #prepare the trade request
             if not mt5.initialize():
                 print("initialize() failed, error code =",mt5.last_error())
             #check that there are no open positions or orders
