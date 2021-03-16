@@ -2,8 +2,9 @@
 import MetaTrader5 as mt5, time, threading
 #time module is needed to select the range of our dataset
 from datetime import datetime, date, time as datetime_time, timedelta
-mt5.initialize()
 #connect to the trade account without specifying a password and a server
+mt5.initialize()
+
 #account number in the top left corner of the MT5 terminal window
 account=##YOUR_ACCOUNT_NUMBER_HERE##
 #the terminal database password is applied if connection data is set to be remembered
@@ -12,11 +13,12 @@ if authorized:
     print("connected to account #{}".format(account))
 else:
     print("failed to connect at account #{}, error code: {}".format(account, mt5.last_error()))
-#log into MT5 terminal
+
+#store the equity of your account
 account_info=mt5.account_info()
 if account_info!=None:
-#store the equity of your account
     equity=float(account_info[10])
+
 #dates will be used to define the range of our dataset in the get_data function
 def get_dates():
     global utc_to, utc_from, from_date, to_date
@@ -26,6 +28,7 @@ def get_dates():
     end_of_day = datetime_time(23,59,59)
     utc_to = datetime.now()
     utc_from = datetime.combine(todays_date, start_of_day) - days_before
+
 #pull one day of 10 minute candles along with the buy and sell prices for bitcoin
 def get_data():
     global candles, current_buy_price, current_sell_price
@@ -36,6 +39,7 @@ def get_data():
      #bid and ask price can also be defined as:
     price_buy=mt5.symbol_info_tick("BTCUSD").bid
     price_sell=mt5.symbol_info_tick("BTCUSD").ask
+
 #build the logic and send the trade request to the MT5 terminal
 def trade():
     global candles
@@ -48,6 +52,7 @@ def trade():
     orders=mt5.orders_get(symbol=symbol)
     symbol_info = mt5.symbol_info(symbol)
     point = mt5.symbol_info(symbol).point
+
     #perform logic check
     if difference >3:
         print("dif 1:", crypto, difference)
@@ -60,6 +65,7 @@ def trade():
             print("dif 2:", crypto, difference)
             price=mt5.symbol_info_tick(symbol).bid
             print(crypto, "is up", "%" + str(difference), "in the last 5 minutes opening BUY position...")
+
             #prepare the trade request
             if not mt5.initialize():
                 print("initialize() failed, error code =",mt5.last_error())
@@ -116,6 +122,7 @@ def trade():
             print("Buying signal detected but there is already an active trade")
         else:
             print("difference is only:", "%" + str(difference), "trying again...")
+            
 #add threading so the bot will always listen for chanchges in price. You can adjust the speed in the time.sleep.
 def go_trade():
     i = 1
