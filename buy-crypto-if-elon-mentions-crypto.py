@@ -13,10 +13,10 @@ import MetaTrader5 as mt5
 
 
 # Store Twitter credentials from dev account
-consumer_key = "BXMvxigHr1xX2tAGZfD9N8X99"
-consumer_secret = "J5tKhUUY6Yw8bALcEtHa5OwFTy6nz6vXHwNf3HZt9PvlI4UyXc"
-access_key = "77040086-eJ1Ol2ZvI9kRv81ffFkdLSF3RRlFkiDNrDRydpI1v"
-access_secret = "e3ttjiSRJJ0BiLeJCytpIWDU3L3q8LuJvwU0cVhdxulWR"
+consumer_key = "consumer_key"
+consumer_secret = "consumer_secret"
+access_key = "access_key"
+access_secret = "access_secret"
 
 # Pass twitter credentials to tweepy via its OAuthHandler
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
@@ -29,7 +29,7 @@ mt5.initialize()
 
 # account number in the top left corner of the MT5 terminal window
 # the terminal database password is applied if connection data is set to be remembered
-account_number = 2016814
+account_number = 555
 authorized = mt5.login(account_number)
 
 if authorized:
