@@ -2,6 +2,9 @@
 import tweepy
 from tweepy import OAuthHandler
 
+#http client for sentiment analysis API
+import http.client, json
+
 #dates module
 from datetime import datetime, date
 from itertools import count
@@ -17,6 +20,9 @@ consumer_key = "consumer_key"
 consumer_secret = "consumer_secret"
 access_key = "access_key"
 access_secret = "access_secret"
+
+#text sentiment API key
+sentiment_key = "sentiment_key"
 
 # Pass twitter credentials to tweepy via its OAuthHandler
 auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
@@ -63,11 +69,35 @@ def get_elons_tweet():
         elons_last_tweet = [re.sub('[^A-Za-z0-9]+', ' ', tweet.full_text) for tweet in tweets]
     return elons_last_tweet[0]
 
+def analyze_sentence():
+    """Determine whether Elons Tweet is positive, negative or neutral"""
+    tweet = get_elons_tweet()
+
+    #fomat the request
+    conn = http.client.HTTPSConnection("text-sentiment.p.rapidapi.com")
+    payload = "text="+tweet
+    headers = {
+        'content-type': "application/x-www-form-urlencoded",
+        'x-rapidapi-key': sentiment_key,
+        'x-rapidapi-host': "text-sentiment.p.rapidapi.com"
+        }
+
+    #post the request
+    conn.request("POST", "/analyze", payload, headers)
+
+    #get response
+    res = conn.getresponse()
+    raw_tweet = res.read()
+
+    #convert response to json
+    json_tweet = json.loads(raw_tweet)
+    return json_tweet['pos']
 
 #buy bitcoin
 def trade():
-    """Check if Musk mentioned bitcoin and open a buy position if so"""
+    """Check if Musk mentioned bitcoin with positive sentiment and open a buy position if so"""
     what_musk_said = get_elons_tweet()
+    tweet_sentiment = analyze_sentence()
 
     # used to check if a position has already been placed
     positions = mt5.positions_get(symbol=CRYPTO)
@@ -76,7 +106,7 @@ def trade():
     price = mt5.symbol_info_tick(CRYPTO).bid
 
     # perform logic check
-    if any(keyword in what_musk_said for keyword in keywords):
+    if any(keyword in what_musk_said for keyword in keywords) and tweet_sentiment > 0:
         print(f'the madlad said it - buying some!')
 
         # prepare the trade request
@@ -132,7 +162,7 @@ def trade():
             print(f'BUY signal detected, but {CRYPTO} has {len(positions)} active trade')
 
     else:
-        print(f'He did not say it, he said: {what_musk_said}')
+        print(f'He did not say it, he said: {what_musk_said} - OR sentiment was not positive')
 
 #execute code every 5 seconds
 if __name__ == '__main__':
